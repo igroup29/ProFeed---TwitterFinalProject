@@ -12,7 +12,7 @@ namespace TwitterAPI.Models
         //private DateTime lastModified;
         private double listAVGRank;
         private List<TProfile> matchingProfiles;
-        // bare in moind - model for product with the following instances.
+        // bare in mind - model for product with the following instances.
         private string product;
         private string majorCategory;
         private string secondCategory;

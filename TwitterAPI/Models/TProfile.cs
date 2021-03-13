@@ -43,40 +43,40 @@ namespace TwitterAPI.Models
             Categories = categories;
         }
 
-        public int InsertProfile(Item item)
-        {
-            DBservices dbs = new DBservices();
+        //public int InsertProfile(Item item)
+        //{
+        //    DBservices dbs = new DBservices();
 
-            int numAffected = dbs.insertListItem(item);
-            return numAffected;
-        }
+        //    int numAffected = dbs.insertListItem(item);
+        //    return numAffected;
+        //}
 
-        public void DeleteItem(int id)
-        {
-            DBservices dbs = new DBservices();
+        //public void DeleteItem(int id)
+        //{
+        //    DBservices dbs = new DBservices();
 
-            dbs.DeleteItemFromList(id);
-        }
+        //    dbs.DeleteItemFromList(id);
+        //}
 
-        public int EditItem(int ItemID, Item newItem)
-        {
-            DBservices dbs = new DBservices();
+        //public int EditItem(int ItemID, Item newItem)
+        //{
+        //    DBservices dbs = new DBservices();
 
-            int numAffected = dbs.EditItemInList(newItem, ItemID);
-            return numAffected;
-        }
+        //    int numAffected = dbs.EditItemInList(newItem, ItemID);
+        //    return numAffected;
+        //}
 
-        public List<Item> GetItems()
-        {
-            DBservices dbs = new DBservices();
-            return dbs.getItems();
-        }
+        //public List<Item> GetItems()
+        //{
+        //    DBservices dbs = new DBservices();
+        //    return dbs.getItems();
+        //}
 
-        public List<Item> GetListItems(int id)
-        {
-            DBservices dbs = new DBservices();
-            return dbs.GetItemstoList(id);
-        }
+        //public List<Item> GetListItems(int id)
+        //{
+        //    DBservices dbs = new DBservices();
+        //    return dbs.GetItemstoList(id);
+        //}
 
     }
 }

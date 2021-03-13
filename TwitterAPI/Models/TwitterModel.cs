@@ -51,6 +51,10 @@ namespace TwitterAPI.Models
             };
             var tweets = await tc.Search.SearchTweetsAsync(parameters);
             return tweets;
+
+
+
+           
             
         }
     }
