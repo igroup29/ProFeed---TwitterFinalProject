@@ -13,18 +13,37 @@ namespace TwitterAPI.Models
 {
     public class ProFeedAlg
     {
-        private ITweet[] tweets;
+        private List<IUser> influencers;
+        private int algoLevel;
 
-        public ProFeedAlg(ITweet[] tc)
+
+        public ProFeedAlg()
         {
-            System.Threading.Thread.Sleep(1000);
-            tweets = tc;
+            Influencers = new List<IUser>();
+            AlgoLevel = 0;
+        } 
+
+        public List<IUser> Influencers { get => influencers; set => influencers = value; }
+        public int AlgoLevel { get => algoLevel; set => algoLevel = value; }
+
+        public List<IUser> PreliminaryFiltering(ITweet[] forFilter)
+        {
+            for(int i = 0;  i<forFilter.Length;i++)
+            {
+                var followersCount = forFilter[i].CreatedBy.FollowersCount;
+                if (followersCount > 10000)
+                {
+                    Influencers.Add(forFilter[i].CreatedBy);
+                    Console.WriteLine(Influencers);
+                }
+
+            }
+            return Influencers;
         }
+        public void SecondFiltration()
+        {
 
-    
-       
-
-
+        }
 
     }
 }
