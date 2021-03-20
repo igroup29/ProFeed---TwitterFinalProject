@@ -50,6 +50,7 @@ namespace TwitterAPI.Models
                 TweetMode = TweetMode.Extended,                      
             };
             var tweets = await tc.Search.SearchTweetsAsync(parameters);
+            var alg = new ProFeedAlg(tweets);
             return tweets;
 
 
