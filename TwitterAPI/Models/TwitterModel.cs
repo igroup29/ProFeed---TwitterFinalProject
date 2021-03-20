@@ -40,9 +40,10 @@ namespace TwitterAPI.Models
 
         public async Task<object> test(string Query,int RetweetMin)
         {
+            string newQuery = Query.Replace("HASHTAG", "#");
             var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
             // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2")     
-             var parameters = new SearchTweetsParameters(Query + " min_retweets:"+ RetweetMin)          
+             var parameters = new SearchTweetsParameters(newQuery + " min_retweets:"+ RetweetMin)          
             {
                 IncludeEntities = true,
                 Lang = LanguageFilter.English,
