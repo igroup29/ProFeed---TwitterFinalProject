@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Threading.Tasks;
+using Tweetinvi;
+using Tweetinvi.Parameters;
+using Tweetinvi.Models;
+using Tweetinvi.Parameters.Enum;
+using Tweetinvi.Parameters.V2;
 
 namespace TwitterAPI.Models
 {
-    public class TUser
+    public class TUser 
     {
         private int userID;
         private string email;

@@ -38,7 +38,7 @@ namespace TwitterAPI.Models
         //    return tweets;
         //}
 
-        public async Task<object> test(string Query,int RetweetMin)
+        public async Task<object> GetTwittsByQuery(string Query,int RetweetMin)
         {
             string newQuery = Query.Replace("HASHTAG", "#");
             var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
@@ -51,10 +51,30 @@ namespace TwitterAPI.Models
                 TweetMode = TweetMode.Extended,                      
             };
             var tweets = await tc.Search.SearchTweetsAsync(parameters);
-            var alg = new ProFeedAlg();
-            var inf = alg.PreliminaryFiltering(tweets);
+            var algo = new ProFeedAlg();
+            var potInfluencer = algo.PreliminaryFiltering(tweets);
+            var PotFriends=algo.SecondFiltration(potInfluencer);
+           // var TimeLine = GetUserTimeline(PotFriends);
             return tweets;
 
+        }
+
+
+        public async Task<object> GetUserTimeline(List<IUser> PotFriends)
+        {
+            var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+         
+            var utl = await tc.Timelines.GetUserTimelineAsync(PotFriends[1].Id);
+
+            return utl;
+        }
+
+        public async Task<object> GetUserFriends(int id)
+        {
+            // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2") 
+            var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+            var friends = await tc.Users.GetFriendsAsync(id);
+            return friends;
         }
     }
 }
