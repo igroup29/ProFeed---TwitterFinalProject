@@ -19,6 +19,7 @@ namespace TwitterAPI.Models
         const int MINFOLLOWERS = 5000;
         private List<IUser> influencers;
         private List<int> influencersDagree;
+        private List<int> profetionals;
         private int algoLevel;
 
 
@@ -28,12 +29,14 @@ namespace TwitterAPI.Models
         {
             Influencers = new List<IUser>();
             influencersDagree = new List<int>();
+            profetionals = new List<int>();
             AlgoLevel = 0;
-        } 
+        }
 
         public List<IUser> Influencers { get => influencers; set => influencers = value; }
         public int AlgoLevel { get => algoLevel; set => algoLevel = value; }
         public List<int> InfluencersDagree { get => influencersDagree; set => influencersDagree = value; }
+        public List<int> Profetionals { get => profetionals; set => profetionals = value; }
 
 
         //DONE
@@ -50,22 +53,26 @@ namespace TwitterAPI.Models
                     {
                         Influencers.Add(forFilter[i].CreatedBy);
                         InfluencersDagree.Add(1);
+                        Profetionals.Add(0);
                     }
                     else
                     {
                         var index = Influencers.IndexOf(forFilter[i].CreatedBy);
                         InfluencersDagree[index]++;
+                        Profetionals[index] = 1; ;
+
                     }
                     Console.WriteLine(Influencers);
                 }
 
             }
+            AlgoLevel++;
             return Influencers;
         }
 
 
 
-        public List<IUser> SecondFiltration(List<IUser> potInfluencers)
+        public List<IUser> PotentialInfluencersFriend()
         {
             List<IUser> PotFriends = new List<IUser>();
 
@@ -73,7 +80,7 @@ namespace TwitterAPI.Models
             {
                 if (InfluencersDagree[i] > 1)
                 {
-                    PotFriends.Add(potInfluencers[i]);
+                    PotFriends.Add(Influencers[i]);
                 }
 
             }
@@ -81,13 +88,26 @@ namespace TwitterAPI.Models
 
         }
 
-        public List<IUser> ThirdFilter(ITweet[] potInfluencers)
+        public List<IUser> SecondFilter(ITweet[] potInfluencers)
         {
            
             return new List<IUser>();
         }
 
+        public void IsProfetional(ITweet[] tweets,string query)
+        {
 
+            foreach(ITweet tweet in tweets)
+            {
+
+            }
+             
+        }
+
+        public void QuerySearchKeys(string query)
+        {
+            var keys = query.Split(';');
+        }
 
         public ArrayList RankingStage(List<IUser> FinalList)
         {

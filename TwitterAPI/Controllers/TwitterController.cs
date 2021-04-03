@@ -19,12 +19,12 @@ namespace TwitterAPI.Controllers
 
         [HttpGet]
         //
-        public async Task<object> Get([FromUri] string request, [FromUri] int RetweetMin)
+        public Task<TProfile[]> Get([FromUri] string request, [FromUri] int RetweetMin)
         {
-            TwitterModel myModel = new TwitterModel();
-            return await myModel.GetTwittsByQuery(request, RetweetMin);
-            //ProFeedApp pfa = new ProFeedApp();
-            //return await pfa.StartSearch(request, RetweetMin);
+            //TwitterModel myModel = new TwitterModel();
+            //return await myModel.GetTwittsByQuery(request, RetweetMin);
+            ProFeedApp pfa = new ProFeedApp();
+            return pfa.StartSearch(request, RetweetMin);
         }
 
 

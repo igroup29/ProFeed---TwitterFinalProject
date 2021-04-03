@@ -14,13 +14,15 @@ namespace TwitterAPI.Models
 
     public class TwitterModel
     {
-        const string ApiKey = "IS2fcuHkE8Cmvoq7eeErjGFyW";
-        const string AccessTokenSecret= "m0HOCvV9jB6PDgcYvFVZMaXIgzc6mJ4E6GAZhSvwjXDxg"; 
-        const string AccessToken= "1349014948106670084-vbVbV6SzbRh4RH8u6putpqOQDGG5Yx";
-        const string ApiKeySecret= "xBZ6eTfKTJULxwiCQz5s7cSNeoEv5wnDDRHqfB42RwQ7rewl82";
+        const string ApiKey = "8gJiTw1ohwk6EyfrKduvLJdII";
+        const string AccessTokenSecret= "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG"; 
+        const string AccessToken= "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
+        const string ApiKeySecret= "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
+        public TwitterClient tc;
 
         public TwitterModel()
         {
+            tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
 
         }
 
@@ -38,10 +40,9 @@ namespace TwitterAPI.Models
         //    return tweets;
         //}
 
-        public async Task<object> GetTwittsByQuery(string Query,int RetweetMin)
+        public async Task<ITweet[]> GetTwittsByQuery(string Query,int RetweetMin)
         {
             string newQuery = Query.Replace("HASHTAG", "#");
-            var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
             // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2")     
              var parameters = new SearchTweetsParameters(newQuery + " min_retweets:"+ RetweetMin)          
             {
@@ -50,31 +51,56 @@ namespace TwitterAPI.Models
                 SearchType = SearchResultType.Mixed,
                 TweetMode = TweetMode.Extended,                      
             };
-            var tweets = await tc.Search.SearchTweetsAsync(parameters);
-            var algo = new ProFeedAlg();
-            var potInfluencer = algo.PreliminaryFiltering(tweets);
-            var PotFriends=algo.SecondFiltration(potInfluencer);
-           // var TimeLine = GetUserTimeline(PotFriends);
+            ITweet[] tweets = null;
+            try
+            {
+                 tweets = await tc.Search.SearchTweetsAsync(parameters);
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        
             return tweets;
 
         }
 
 
-        public async Task<object> GetUserTimeline(List<IUser> PotFriends)
+        public async Task<ITweet[]> GetUserTimeline(IUser potInfluencer)
         {
-            var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
-         
-            var utl = await tc.Timelines.GetUserTimelineAsync(PotFriends[1].Id);
+            //Requests / 15-min window (user auth) - 900
+            //
+            ITweet[] utl= null;
+            try
+            {
+               utl = await tc.Timelines.GetUserTimelineAsync(potInfluencer.Id);
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
 
+            }
             return utl;
         }
 
         public async Task<object> GetUserFriends(int id)
         {
             // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2") 
-            var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
             var friends = await tc.Users.GetFriendsAsync(id);
             return friends;
+        }
+
+        public async Task<object> GetUserByID(IUser test)
+        {
+            Tweetinvi.Models.V2.UserV2 user = null;
+            try
+            {
+                var userResponse = await tc.UsersV2.GetUserByIdAsync(test.Id);
+                user = userResponse.User;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return user;
         }
     }
 }

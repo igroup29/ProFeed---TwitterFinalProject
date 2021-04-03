@@ -215,6 +215,7 @@
     <Compile Include="Models\ProFeedApp.cs" />
     <Compile Include="Models\TList.cs" />
     <Compile Include="Models\TProfile.cs" />
+    <Compile Include="Models\TSeaechKey.cs" />
     <Compile Include="Models\TUser.cs" />
     <Compile Include="Models\TwitterModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
