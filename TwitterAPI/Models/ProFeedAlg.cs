@@ -17,10 +17,10 @@ namespace TwitterAPI.Models
     {
         const int MAXFOLLOWERS = 1000000;
         const int MINFOLLOWERS = 5000;
-        private List<IUser> influencers;
-        private List<int> influencersDagree;
-        private List<int> profetionals;
-        private int algoLevel;
+        public List<IUser> Influencers { get; set; }
+        public int AlgoLevel { get; set; }
+        public List<int> InfluencersDagree { get; set; }
+        public List<IUser> Profetionals { get; set; }
 
 
 
@@ -28,15 +28,12 @@ namespace TwitterAPI.Models
         public ProFeedAlg()
         {
             Influencers = new List<IUser>();
-            influencersDagree = new List<int>();
-            profetionals = new List<int>();
+            InfluencersDagree = new List<int>();
+            Profetionals = new List<IUser>();
             AlgoLevel = 0;
         }
 
-        public List<IUser> Influencers { get => influencers; set => influencers = value; }
-        public int AlgoLevel { get => algoLevel; set => algoLevel = value; }
-        public List<int> InfluencersDagree { get => influencersDagree; set => influencersDagree = value; }
-        public List<int> Profetionals { get => profetionals; set => profetionals = value; }
+    
 
 
         //DONE
@@ -53,39 +50,56 @@ namespace TwitterAPI.Models
                     {
                         Influencers.Add(forFilter[i].CreatedBy);
                         InfluencersDagree.Add(1);
-                        Profetionals.Add(0);
                     }
                     else
                     {
                         var index = Influencers.IndexOf(forFilter[i].CreatedBy);
-                        InfluencersDagree[index]++;
-                        Profetionals[index] = 1; ;
-
+                        InfluencersDagree[index]++;                        
                     }
                     Console.WriteLine(Influencers);
                 }
 
             }
             AlgoLevel++;
+            PotentialInfluencersFriend();
+            return Influencers;
+        }
+
+        public List<IUser> PreliminaryFiltering(IUser[] forFilter)
+        {
+            for (int i = 0; i < forFilter.Length; i++)
+            {
+                var followersCount = forFilter[i].FollowersCount;
+                var friendsCount = forFilter[i].FriendsCount;
+                var followerRank = (double)followersCount / (double)(followersCount + friendsCount);
+                if (followersCount > MINFOLLOWERS && followersCount < MAXFOLLOWERS && followerRank > 0.92)
+                {
+                    if (!Influencers.Contains(forFilter[i]))
+                    {
+                        Influencers.Add(forFilter[i]);
+                        InfluencersDagree.Add(1);
+                    }
+                    else
+                    {
+                        var index = Influencers.IndexOf(forFilter[i]);
+                        InfluencersDagree[index]++;
+                    }
+                }
+            }
+            AlgoLevel++;
             return Influencers;
         }
 
 
-
-        public List<IUser> PotentialInfluencersFriend()
+        public void PotentialInfluencersFriend()
         {
-            List<IUser> PotFriends = new List<IUser>();
-
             for (int i = 0; i < InfluencersDagree.Count; i++)
             {
-                if (InfluencersDagree[i] > 1)
+                if (InfluencersDagree[i] > 1 && Profetionals.Count < 5)
                 {
-                    PotFriends.Add(Influencers[i]);
+                    Profetionals.Add(Influencers[i]);
                 }
-
             }
-            return PotFriends;
-
         }
 
         public List<IUser> SecondFilter(ITweet[] potInfluencers)
@@ -94,16 +108,44 @@ namespace TwitterAPI.Models
             return new List<IUser>();
         }
 
-        public void IsProfetional(ITweet[] tweets,string query)
+        public int IsProfetional(ITweet[] tweets,string[] query)
         {
-
+            int inTweetsCounter = 0;
+            int inCalculationCounter = 0;
             foreach(ITweet tweet in tweets)
             {
-
+                if (tweet.Retweeted == false && tweet.IsRetweet == true)
+                {
+                    inCalculationCounter++;
+                    var hashTagsToCheck = new ArrayList();
+                    foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
+                    {
+                        hashTagsToCheck.Add(entity.Text);
+                    }
+                    foreach (string q in query)
+                    {
+                        foreach (string hashtag in hashTagsToCheck)
+                        {
+                            if (hashtag.Equals(q))
+                            {
+                                inTweetsCounter++;
+                                hashTagsToCheck.Remove(hashtag);
+                            }
+                        }
+                    }
+                }
             }
-             
+            try
+            {
+                return (int)(inTweetsCounter / inCalculationCounter);
+            }catch(DivideByZeroException dbze)
+            {
+                Console.WriteLine(dbze.Message);
+                return 0;
+            }
+            
         }
-
+        //unresolved, mayby not relevant
         public void QuerySearchKeys(string query)
         {
             var keys = query.Split(';');
@@ -124,6 +166,10 @@ namespace TwitterAPI.Models
             return InfluencerArray;
         }
 
-
+        public void ClearLists()
+        {
+            Influencers.Clear();
+            InfluencersDagree.Clear();
+        }
     }
 }

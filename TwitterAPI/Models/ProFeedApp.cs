@@ -15,10 +15,12 @@ namespace TwitterAPI.Models
 {
     public class ProFeedApp
     {
+        const int MAXDEGEE = 2;
+        const int MINRANGE = 2;
         private ProFeedAlg pFAlg;
         private TwitterModel tm;
-        private List<IUser> influencers;
-        private TProfile[] finalList;
+        private List<TProfile> finalList;
+        private string[] searchQuery = { "fintech","stockExchange" ,"forex"};
 
         //var inf = alg.PreliminaryFiltering(tweets);
 
@@ -26,65 +28,114 @@ namespace TwitterAPI.Models
         {
             PFAlg = new ProFeedAlg();
             TM = new TwitterModel();
-            //Influencers = new List<IUser>();
-            FinalList = new TProfile[] { };
+            FinalList = new List<TProfile>();
 
         }
         public ProFeedApp(string query)
         {
             PFAlg = new ProFeedAlg();
             TM = new TwitterModel();
-            //Influencers = new List<IUser>();
-            FinalList = new TProfile[] { };
+            FinalList = new List<TProfile>();
+             
 
         }
 
         public ProFeedAlg PFAlg { get => pFAlg; set => pFAlg = value; }
         public TwitterModel TM { get => tm; set => tm = value; }
-        public List<IUser> Influencers { get => influencers; set => influencers = value; }
-        public TProfile[] FinalList { get => finalList; set => finalList = value; }
+        public List<TProfile> FinalList { get => finalList; set => finalList = value; }
+        public string[] SearchQuery { get => searchQuery; set => searchQuery = value; }
 
-
-        public async Task<TProfile[]> StartSearch(string Query, int RetweetMin)
+        public async Task Work(IUser user,int index)
         {
-            //step 1 - 
+            try
+            {
+                var timeline = await TM.GetUserTimeline(user);
+                var inBusiness = PFAlg.IsProfetional(timeline, searchQuery);
+                FinalList.Add(new TProfile(user.Id, user.Name, user.ScreenName,user.Verified));
+                if (inBusiness > MINRANGE && PFAlg.InfluencersDagree[index] > MAXDEGEE)
+                {
+                    FinalList.Last().Profetional = true;
+                    if (!PFAlg.Profetionals.Equals(user))
+                    {
+                        if (PFAlg.Profetionals.Count > 4)
+                            PFAlg.Profetionals.RemoveAt(0);
+                        PFAlg.Profetionals.Add(user);
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        public async Task Work2(IUser user, int index)
+        {
+            try
+            {
+                var timeline = await TM.GetUserTimeline(user);
+                var inBusiness = PFAlg.IsProfetional(timeline, searchQuery);
+                if (inBusiness > MINRANGE && PFAlg.InfluencersDagree[index] > MAXDEGEE)
+                {
+                    FinalList.Add(new TProfile(user.Id, user.Name, user.ScreenName, user.Verified));
+                    FinalList.Last().Profetional = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        public async Task<List<TProfile>> StartSearch(string Query, int RetweetMin)
+        {
+            //step 1 -
             var tweets = await TM.GetTwittsByQuery(Query, RetweetMin);
-            Influencers = PFAlg.PreliminaryFiltering(tweets);
+            var influencers = PFAlg.PreliminaryFiltering(tweets);
             //step 2 - 
-            // ArrayList 
-            List<Thread> threads = new List<Thread>();
-            foreach(IUser iUser in Influencers)
+            List<Task> threads = new List<Task>();
+            int influecersIndex = 0;
+            foreach(IUser iUser in influencers)
             {
                 //await TM.GetUserTimeline(iUser);
-                var work = new ThreadWork();
-                work.user = iUser;
-                threads.Add(new Thread(new ThreadStart(work.Work)));
-                threads.Last().Start();
+                var newTaskToAdd = Task.Factory.StartNew(async()=>await Work(iUser,influecersIndex));
+                influecersIndex++;
+                threads.Add(newTaskToAdd.Unwrap());
             }
-            //var PotFriends = algo.SecondFiltration(potInfluencer);
-            //var user = await GetUserByID(potInfluencer[0]);
-            //var TimeLine = await GetUserTimeline(PotFriends);
-            //var user = await TM.GetUserByID(Influencers.First());
-            System.Threading.Thread.Sleep(1000);
-            return finalList;
-        }
-        //public void ThreadWork(IUser user)
-        //{
-        //    var timeline =  TM.GetUserTimeline(user);
 
-        //}
-
-    }
-
-    class ThreadWork
-    {
-        public IUser user;
-        public void Work()
-        {
-            var TM = new TwitterModel();
-            var PFAlg = new ProFeedAlg();
-            var timeline =  TM.GetUserTimeline(user);
-
+            Task step2 =  Task.WhenAll(threads.ToArray());
+            try
+            {
+                await step2;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            //works to here 11-04-21
+            //step 3-
+            PFAlg.ClearLists();
+            threads.Clear();
+            influecersIndex = 0;
+            foreach (IUser user in PFAlg.Profetionals)
+            {
+                try
+                {
+                    var userFriends = await TM.GetUserFriends(user.Id);
+                    influencers = PFAlg.PreliminaryFiltering(userFriends);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                foreach (IUser iUser in influencers)
+                {
+                    //await TM.GetUserTimeline(iUser);
+                    var temp = Task.Factory.StartNew(async () => await Work2(iUser, influecersIndex));
+                    influecersIndex++;
+                    threads.Add(temp);
+                }
+            }
+            return FinalList;
         }
     }
 }

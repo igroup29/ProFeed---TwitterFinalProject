@@ -16,15 +16,23 @@ namespace TwitterAPI.Controllers
         //{
         //    return new string[] { "value1", "value2" };
         //}
+        ProFeedApp proFeedApp = new ProFeedApp();
 
         [HttpGet]
         //
-        public Task<TProfile[]> Get([FromUri] string request, [FromUri] int RetweetMin)
+        public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
         {
-            //TwitterModel myModel = new TwitterModel();
-            //return await myModel.GetTwittsByQuery(request, RetweetMin);
-            ProFeedApp pfa = new ProFeedApp();
-            return pfa.StartSearch(request, RetweetMin);
+            try
+            {
+                //TwitterModel myModel = new TwitterModel();
+                //return await myModel.GetTwittsByQuery(request, RetweetMin);
+                return await proFeedApp.StartSearch(request, RetweetMin);
+
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Parameters;
@@ -11,57 +12,32 @@ using Tweetinvi.Parameters.V2;
 
 namespace TwitterAPI.Models
 {
-
     public class TwitterModel
     {
         const string ApiKey = "8gJiTw1ohwk6EyfrKduvLJdII";
-        const string AccessTokenSecret= "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG"; 
-        const string AccessToken= "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
-        const string ApiKeySecret= "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
+        const string AccessTokenSecret = "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG";
+        const string AccessToken = "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
+        const string ApiKeySecret = "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
         public TwitterClient tc;
 
         public TwitterModel()
         {
             tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
-
         }
 
-        //public async Task2<object> test()
-        //{
-        //    var tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
-        //    var parameters = new SearchTweetsParameters("#Gaming")
-        //    {
-        //        IncludeEntities = true,
-        //        Lang = LanguageFilter.English,
-        //        SearchType = SearchResultType.Mixed,
-        //        TweetMode = TweetMode.Extended
-        //    };
-        //    var tweets = await tc.Search.SearchTweetsAsync(parameters);
-        //    return tweets;
-        //}
-
-        public async Task<ITweet[]> GetTwittsByQuery(string Query,int RetweetMin)
+        public async Task<ITweet[]> GetTwittsByQuery(string Query, int RetweetMin)
         {
             string newQuery = Query.Replace("HASHTAG", "#");
             // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2")     
-             var parameters = new SearchTweetsParameters(newQuery + " min_retweets:"+ RetweetMin)          
+            var parameters = new SearchTweetsParameters(newQuery + " min_retweets:" + RetweetMin)
             {
                 IncludeEntities = true,
                 Lang = LanguageFilter.English,
                 SearchType = SearchResultType.Mixed,
-                TweetMode = TweetMode.Extended,                      
+                TweetMode = TweetMode.Extended,
             };
-            ITweet[] tweets = null;
-            try
-            {
-                 tweets = await tc.Search.SearchTweetsAsync(parameters);
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        
-            return tweets;
 
+            return await tc.Search.SearchTweetsAsync(parameters);
         }
 
 
@@ -69,38 +45,18 @@ namespace TwitterAPI.Models
         {
             //Requests / 15-min window (user auth) - 900
             //
-            ITweet[] utl= null;
-            try
-            {
-               utl = await tc.Timelines.GetUserTimelineAsync(potInfluencer.Id);
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-
-            }
-            return utl;
+            return await tc.Timelines.GetUserTimelineAsync(potInfluencer.Id);
         }
 
-        public async Task<object> GetUserFriends(int id)
+        public async Task<IUser[]> GetUserFriends(long id)
         {
-            // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2") 
-            var friends = await tc.Users.GetFriendsAsync(id);
-            return friends;
+            return await tc.Users.GetFriendsAsync(id);
         }
 
-        public async Task<object> GetUserByID(IUser test)
+        public async Task<object> GetUserByID(IUser user)
         {
-            Tweetinvi.Models.V2.UserV2 user = null;
-            try
-            {
-                var userResponse = await tc.UsersV2.GetUserByIdAsync(test.Id);
-                user = userResponse.User;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return user;
+            var userResult =  await tc.UsersV2.GetUserByIdAsync(user.Id);
+            return userResult.User;
         }
     }
 }

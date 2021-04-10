@@ -7,41 +7,31 @@ namespace TwitterAPI.Models
 {
     public class TProfile
     {
-        private string email;
-        private int listID;
-        private double rank;
-        private int followers;
-        private int isVerified;
-        private int reach;
-        private int impact;
-        private double engagment;
-        private string image;
-        private List<string> categories;
+        public long ProfileID { get; set; }
+        public string Name { get; set; }
+        public string ScreenName { get; set; }
+        public string Email { get; set; }
+        public bool Profetional { get; set; }
+        public int ListID { get; set; }
+        public double Rank { get; set; }
+        public int Followers { get; set; }
+        public bool IsVerified { get; set; }
+        public double Reach { get; set; }
+        public double Impact { get; set; }
+        public double Engagment { get; set; }
+        public string Image { get; set; }
+        //category will obligate relation table in DB
+        //public List<string> Categories { get; set; }
 
-        public string Email { get => email; set => email = value; }
-        public int ListID { get => listID; set => listID = value; }
-        public double Rank { get => rank; set => rank = value; }
-        public int Followers { get => followers; set => followers = value; }
-        public int IsVerified { get => isVerified; set => isVerified = value; }
-        public int Reach { get => reach; set => reach = value; }
-        public int Impact { get => impact; set => impact = value; }
-        public double Engagment { get => engagment; set => engagment = value; }
-        public string Image { get => image; set => image = value; }
-        public List<string> Categories { get => categories; set => categories = value; }
-
-        public TProfile(string email, int listID, double rank, int followers, int isVerified, int reach, int impact, double engagment, string image, List<string> categories)
+        public TProfile(long id,string name,string screenName,bool verified)
         {
-            Email= email;
-            ListID = listID;
-            Rank = rank;
-            Followers = followers;
-            IsVerified = isVerified;
-            Reach = reach;
-            Impact = impact;
-            Engagment = engagment;
-            Image = image;
-            Categories = categories;
+            ProfileID = id;
+            Name = name;
+            ScreenName = screenName;
+            Profetional = false;
+            IsVerified = verified;
         }
+
 
         //public int InsertProfile(Item item)
         //{
