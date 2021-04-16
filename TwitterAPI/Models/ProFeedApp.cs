@@ -86,6 +86,17 @@ namespace TwitterAPI.Models
                 Console.WriteLine(ex.Message);
             }
         }
+
+        public async Task WaitAllTasks(List<Task> tasks)
+        {
+            Task step2 = Task.WhenAll(tasks.ToArray());
+            await step2;
+        }
+        public void InitiateDataContainers(List<Task> list,int )
+        {
+          
+        }
+
         public async Task<List<TProfile>> StartSearch(string Query, int RetweetMin)
         {
             //step 1 -
@@ -101,11 +112,9 @@ namespace TwitterAPI.Models
                 influecersIndex++;
                 threads.Add(newTaskToAdd.Unwrap());
             }
-
-            Task step2 =  Task.WhenAll(threads.ToArray());
             try
             {
-                await step2;
+                await WaitAllTasks(threads);
             }
             catch (Exception ex)
             {
@@ -118,6 +127,7 @@ namespace TwitterAPI.Models
             influecersIndex = 0;
             foreach (IUser user in PFAlg.Profetionals)
             {
+                TM.UpdateTwitterClient();
                 try
                 {
                     var userFriends = await TM.GetUserFriends(user.Id);
@@ -129,10 +139,20 @@ namespace TwitterAPI.Models
                 }
                 foreach (IUser iUser in influencers)
                 {
-                    //await TM.GetUserTimeline(iUser);
                     var temp = Task.Factory.StartNew(async () => await Work2(iUser, influecersIndex));
                     influecersIndex++;
                     threads.Add(temp);
+                }
+                try
+                {
+                    await WaitAllTasks(threads);
+                    PFAlg.ClearLists();
+                    threads.Clear();
+                    influecersIndex = 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
             return FinalList;

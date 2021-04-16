@@ -114,9 +114,11 @@ namespace TwitterAPI.Models
             int inCalculationCounter = 0;
             foreach(ITweet tweet in tweets)
             {
-                if (tweet.Retweeted == false && tweet.IsRetweet == true)
+                if (tweet.Hashtags.Count !=0 && tweet.IsRetweet == true)
                 {
                     inCalculationCounter++;
+                    if (tweet.Retweeted == true)
+                        inTweetsCounter += 3;
                     var hashTagsToCheck = new ArrayList();
                     foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
                     {

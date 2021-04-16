@@ -24,6 +24,10 @@ namespace TwitterAPI.Models
         {
             tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
         }
+        public void UpdateTwitterClient()
+        {
+            tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+        }
 
         public async Task<ITweet[]> GetTwittsByQuery(string Query, int RetweetMin)
         {
