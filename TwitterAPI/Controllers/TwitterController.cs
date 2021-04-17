@@ -13,19 +13,16 @@ namespace TwitterAPI.Controllers
     {
         ProFeedApp proFeedApp = new ProFeedApp();
 
-        // GET api/<controller>
-       
+        // GET api/<controller>  
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        //// public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
         [HttpGet]
         [Route("api/Twitter")]
-        public async Task<List<TProfile>> GetAsync([FromUri] string request)
+        public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
         {
-            int RetweetMin = 4;
             try
             {
                 //TwitterModel myModel = new TwitterModel();
@@ -39,14 +36,6 @@ namespace TwitterAPI.Controllers
                 Console.WriteLine(ex.Message);
                 return null;
             }
-        }
-
-
-        // GET api/<controller>/5
-       
-        public string Get([FromUri] string request)
-        {
-            return "value";
         }
 
         // POST api/<controller>
