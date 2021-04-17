@@ -11,24 +11,30 @@ namespace TwitterAPI.Controllers
 {
     public class TwitterController : ApiController
     {
-        //// GET api/<controller>
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
         ProFeedApp proFeedApp = new ProFeedApp();
 
-        [HttpGet]
-        //
-        public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
+        // GET api/<controller>
+       
+        public IEnumerable<string> Get()
         {
+            return new string[] { "value1", "value2" };
+        }
+
+        //// public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
+        [HttpGet]
+        [Route("api/Twitter")]
+        public async Task<List<TProfile>> GetAsync([FromUri] string request)
+        {
+            int RetweetMin = 4;
             try
             {
                 //TwitterModel myModel = new TwitterModel();
                 //return await myModel.GetTwittsByQuery(request, RetweetMin);
+                //  return await proFeedApp.StartSearch(request, RetweetMin);
                 return await proFeedApp.StartSearch(request, RetweetMin);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return null;
@@ -37,10 +43,11 @@ namespace TwitterAPI.Controllers
 
 
         // GET api/<controller>/5
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+       
+        public string Get([FromUri] string request)
+        {
+            return "value";
+        }
 
         // POST api/<controller>
         public void Post([FromBody]string value)
