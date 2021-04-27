@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
-using System.Web;
-using System.Threading.Tasks;
-using Tweetinvi;
-using Tweetinvi.Parameters;
 using Tweetinvi.Models;
-using Tweetinvi.Parameters.Enum;
-using Tweetinvi.Parameters.V2;
+
 
 
 namespace TwitterAPI.Models
@@ -108,44 +102,53 @@ namespace TwitterAPI.Models
             return new List<IUser>();
         }
 
-        public int IsProfetional(ITweet[] tweets,string[] query)
+        public double IsProfetional(ITweet[] tweets,string[] query)
         {
-            int inTweetsCounter = 0;
+            int tweetsCounter = 0;
             int inCalculationCounter = 0;
-            foreach(ITweet tweet in tweets)
+            double returnCalculation = 0;
+            try
             {
-                if (tweet.Hashtags.Count !=0 && tweet.IsRetweet == true)
+                foreach (ITweet tweet in tweets)
                 {
-                    inCalculationCounter++;
-                    if (tweet.Retweeted == true)
-                        inTweetsCounter += 3;
-                    var hashTagsToCheck = new ArrayList();
-                    foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
+                    if (tweet.Hashtags.Count != 0 && tweet.IsRetweet == false)
                     {
-                        hashTagsToCheck.Add(entity.Text);
-                    }
-                    foreach (string q in query)
-                    {
-                        foreach (string hashtag in hashTagsToCheck)
+                        inCalculationCounter++;
+                        if (tweet.Retweeted == true)
+                            tweetsCounter += 3;
+                        var hashTagsToCheck = new ArrayList();
+                        foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
                         {
-                            if (hashtag.Equals(q))
+                            hashTagsToCheck.Add(entity.Text);
+                        }
+                        foreach (string q in query)
+                        {
+                            foreach (string hashtag in hashTagsToCheck.ToArray())
                             {
-                                inTweetsCounter++;
-                                hashTagsToCheck.Remove(hashtag);
+                                if (q.Equals(hashtag.ToLower()))
+                                {
+                                    tweetsCounter++;
+                                    hashTagsToCheck.Remove(hashtag);
+                                }
                             }
                         }
                     }
                 }
+                returnCalculation = (double)tweetsCounter / inCalculationCounter;
             }
-            try
-            {
-                return (int)(inTweetsCounter / inCalculationCounter);
-            }catch(DivideByZeroException dbze)
+            catch (DivideByZeroException dbze)
             {
                 Console.WriteLine(dbze.Message);
                 return 0;
             }
-            
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            if (inCalculationCounter * 5 < tweets.Length)
+                return 0;
+            return returnCalculation;
+
         }
         //unresolved, mayby not relevant
         public void QuerySearchKeys(string query)

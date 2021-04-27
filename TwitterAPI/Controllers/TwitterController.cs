@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using System.Threading.Tasks;
 using TwitterAPI.Models;
+using System.Web.Http;
 
 namespace TwitterAPI.Controllers
 {
@@ -20,7 +17,7 @@ namespace TwitterAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/Twitter")]
+        //[Route("api/Twitter")]
         public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
         {
             try
