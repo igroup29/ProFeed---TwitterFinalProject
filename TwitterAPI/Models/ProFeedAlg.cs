@@ -11,6 +11,7 @@ namespace TwitterAPI.Models
     {
         const int MAXFOLLOWERS = 1000000;
         const int MINFOLLOWERS = 5000;
+        const int AMPLIFIER = 5;
         public List<IUser> Influencers { get; set; }
         public int AlgoLevel { get; set; }
         public List<int> InfluencersDagree { get; set; }
@@ -102,11 +103,14 @@ namespace TwitterAPI.Models
             return new List<IUser>();
         }
 
-        public double IsProfetional(ITweet[] tweets,string[] query)
+        public double IsProfetional(ITweet[] tweets,ArrayList query,TProfile profile)
         {
             int tweetsCounter = 0;
+            int retweetCounter = 0;
             int inCalculationCounter = 0;
             double returnCalculation = 0;
+            string insertToStack = "Number of tweets in timeline:" + tweets.Length;
+            profile.StackTrace.Add(insertToStack);
             try
             {
                 foreach (ITweet tweet in tweets)
@@ -115,7 +119,10 @@ namespace TwitterAPI.Models
                     {
                         inCalculationCounter++;
                         if (tweet.Retweeted == true)
+                        {
+                            retweetCounter++;
                             tweetsCounter += 3;
+                        }
                         var hashTagsToCheck = new ArrayList();
                         foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
                         {
@@ -145,7 +152,15 @@ namespace TwitterAPI.Models
             {
                 Console.WriteLine(ex.Message);
             }
-            if (inCalculationCounter * 5 < tweets.Length)
+            //Inserting dats to profile stackTrace
+            insertToStack = "Calculated Tweets:" +inCalculationCounter;
+            profile.StackTrace.Add(insertToStack);
+            insertToStack = "Number of Tweets contaning query:" + tweetsCounter;
+            profile.StackTrace.Add(insertToStack);
+            insertToStack = "Number of ReTweets:" + retweetCounter;
+            profile.StackTrace.Add(insertToStack);
+
+            if (inCalculationCounter * AMPLIFIER < tweets.Length)
                 return 0;
             return returnCalculation;
 

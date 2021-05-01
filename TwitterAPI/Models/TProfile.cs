@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -14,7 +15,6 @@ namespace TwitterAPI.Models
         public string Website { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
-        public string Banner { get; set; }
         public bool Profetional { get; set; }
         public int ListID { get; set; }
         public double Rank { get; set; }
@@ -24,9 +24,19 @@ namespace TwitterAPI.Models
         public double Impact { get; set; }
         public double Engagment { get; set; }
         public string Image { get; set; }
-        public string[] SruckTrace {get;set;}
+        public ArrayList StackTrace {get;set;}
         //category will obligate relation table in DB
         //public List<string> Categories { get; set; }
+
+        public TProfile()
+        {
+            Rank = 0;
+            Reach = 0;
+            Impact = 0;
+            Engagment = 0;
+            Profetional = false;
+            StackTrace = new ArrayList();
+        }
 
         public TProfile(long id,string name,string screenName,bool verified)
         {
@@ -35,43 +45,9 @@ namespace TwitterAPI.Models
             ScreenName = screenName;
             Profetional = false;
             IsVerified = verified;
+            StackTrace = new ArrayList();
+
         }
-
-
-        //public int InsertProfile(Item item)
-        //{
-        //    DBservices dbs = new DBservices();
-
-        //    int numAffected = dbs.insertListItem(item);
-        //    return numAffected;
-        //}
-
-        //public void DeleteItem(int id)
-        //{
-        //    DBservices dbs = new DBservices();
-
-        //    dbs.DeleteItemFromList(id);
-        //}
-
-        //public int EditItem(int ItemID, Item newItem)
-        //{
-        //    DBservices dbs = new DBservices();
-
-        //    int numAffected = dbs.EditItemInList(newItem, ItemID);
-        //    return numAffected;
-        //}
-
-        //public List<Item> GetItems()
-        //{
-        //    DBservices dbs = new DBservices();
-        //    return dbs.getItems();
-        //}
-
-        //public List<Item> GetListItems(int id)
-        //{
-        //    DBservices dbs = new DBservices();
-        //    return dbs.GetItemstoList(id);
-        //}
 
     }
 }
