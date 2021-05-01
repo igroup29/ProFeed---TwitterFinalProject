@@ -14,6 +14,7 @@ namespace TwitterAPI.Models
         public string Website { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+        public string Banner { get; set; }
         public bool Profetional { get; set; }
         public int ListID { get; set; }
         public double Rank { get; set; }
