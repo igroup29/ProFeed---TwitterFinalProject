@@ -97,8 +97,11 @@ namespace TwitterAPI.Models
         {
             FinalList.Add(new TProfile(user.Id, user.Name, user.ScreenName, user.Verified));
             FinalList.Last().Followers = user.FollowersCount;
-            FinalList.Last().Image = user.ProfileImageUrl;
-            FinalList.Last().Url = user.Url;
+            FinalList.Last().Image = user.ProfileImageUrl400x400;
+            FinalList.Last().ProfileUrl = "https://twitter.com/" + user.ScreenName;
+            FinalList.Last().Website = user.Url;
+            FinalList.Last().Description = user.Description;
+            FinalList.Last().Location = user.Location;
             FinalList.Last().Reach = ProFeedAlg.InfluencersDagree[index];
         }
 

@@ -10,7 +10,10 @@ namespace TwitterAPI.Models
         public long ProfileID { get; set; }
         public string Name { get; set; }
         public string ScreenName { get; set; }
-        public string Url { get; set; }
+        public string ProfileUrl { get; set; }
+        public string Website { get; set; }
+        public string Description { get; set; }
+        public string Location { get; set; }
         public bool Profetional { get; set; }
         public int ListID { get; set; }
         public double Rank { get; set; }

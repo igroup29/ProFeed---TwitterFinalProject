@@ -17,7 +17,7 @@ namespace TwitterAPI.Controllers
         }
 
         [HttpGet]
-        //[Route("api/Twitter")]
+        [Route("api/Twitter")]
         public async Task<List<TProfile>> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
         {
             try
