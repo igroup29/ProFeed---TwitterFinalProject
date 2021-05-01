@@ -24,6 +24,7 @@ namespace TwitterAPI.Models
         public double Impact { get; set; }
         public double Engagment { get; set; }
         public string Image { get; set; }
+        public string[] SruckTrace {get;set;}
         //category will obligate relation table in DB
         //public List<string> Categories { get; set; }
 

@@ -17,34 +17,29 @@ namespace TwitterAPI.Models
     {
         const double PRORANGE = 0.35;
         const double MINRANGE = 0.25;
-        private ProFeedAlg proFeedAlg;
-        private TwitterModel twitterModel;
-        private List<TProfile> finalList;
         private string[] searchQuery = { "fintech","stockExchange" ,"forex"};
-        private SemaphoreSlim mutex = new SemaphoreSlim(1, 1);
 
         //var inf = alg.PreliminaryFiltering(tweets);
+        public ProFeedAlg ProFeedAlg { get; set; }
+        public TwitterModel TwitterModel { get; set; }
+        public TData SearchData { get; set; }
+        public string[] SearchQuery { get; set; }
 
         public ProFeedApp()
         {
             ProFeedAlg = new ProFeedAlg();
             TwitterModel = new TwitterModel();
-            FinalList = new List<TProfile>();
+            SearchData = new TData();
 
         }
         public ProFeedApp(string query)
         {
             ProFeedAlg = new ProFeedAlg();
             TwitterModel = new TwitterModel();
-            FinalList = new List<TProfile>();
-             
-
+            SearchData = new TData();
         }
 
-        public ProFeedAlg ProFeedAlg { get => proFeedAlg; set => proFeedAlg = value; }
-        public TwitterModel TwitterModel { get => twitterModel; set => twitterModel = value; }
-        public List<TProfile> FinalList { get => finalList; set => finalList = value; }
-        public string[] SearchQuery { get => searchQuery; set => searchQuery = value; }
+        
 
         public async Task Work(IUser user,int index)
         {
@@ -55,7 +50,7 @@ namespace TwitterAPI.Models
                 InsertDataToTProfile(user,index);
                 if (inBusiness > MINRANGE)
                 {
-                    FinalList.Last().Profetional = true;
+                    SearchData.FinalList.Last().Profetional = true;
                     if (!ProFeedAlg.Profetionals.Equals(user))
                     {
                         if (ProFeedAlg.Profetionals.Count > 4)
@@ -79,7 +74,7 @@ namespace TwitterAPI.Models
                 if (inBusiness > PRORANGE)
                 {
                     InsertDataToTProfile(user,index);
-                    FinalList.Last().Profetional = true;
+                    SearchData.FinalList.Last().Profetional = true;
                 }
             }
             catch (Exception ex)
@@ -95,18 +90,18 @@ namespace TwitterAPI.Models
         }
         public void InsertDataToTProfile(IUser user,int index)
         {
-            FinalList.Add(new TProfile(user.Id, user.Name, user.ScreenName, user.Verified));
-            FinalList.Last().Followers = user.FollowersCount;
-            FinalList.Last().Image = user.ProfileImageUrl400x400;
-            FinalList.Last().ProfileUrl = "https://twitter.com/" + user.ScreenName;
-            FinalList.Last().Website = user.Url;
-            FinalList.Last().Banner = user.ProfileBannerURL;
-            FinalList.Last().Description = user.Description;
-            FinalList.Last().Location = user.Location;
-            FinalList.Last().Reach = ProFeedAlg.InfluencersDagree[index];
+            SearchData.FinalList.Add(new TProfile(user.Id, user.Name, user.ScreenName, user.Verified));
+            SearchData.FinalList.Last().Followers = user.FollowersCount;
+            SearchData.FinalList.Last().Image = user.ProfileImageUrl400x400;
+            SearchData.FinalList.Last().ProfileUrl = "https://twitter.com/" + user.ScreenName;
+            SearchData.FinalList.Last().Website = user.Url;
+            SearchData.FinalList.Last().Banner = user.ProfileBannerURL;
+            SearchData.FinalList.Last().Description = user.Description;
+            SearchData.FinalList.Last().Location = user.Location;
+            SearchData.FinalList.Last().Reach = ProFeedAlg.InfluencersDagree[index];
         }
 
-        public async Task<List<TProfile>> StartSearch(string Query, int RetweeTwitterModelin)
+        public async Task<TData> StartSearch(string Query, int RetweeTwitterModelin)
         {
             //step 1 -
             var tweets = await TwitterModel.GetTwittsByQuery(Query, RetweeTwitterModelin);
@@ -162,7 +157,8 @@ namespace TwitterAPI.Models
                     Console.WriteLine(ex.Message);
                 }
             }
-            return FinalList;
+            //
+            return SearchData;
         }
     }
 }

@@ -12,29 +12,17 @@ using System.Collections;
 
 namespace TwitterAPI.Models
 {
-    public class TSeaechKey
+    public class TData
     {
-        private string mainCategory;
-        private string subCategory;
-        private string[] searchKeys;
-        private string[] hashtags;
+        public string[] AppStuckTrace { get; set; }
+        public List<TProfile> FinalList { get; set; }
+        public string[] SearchKeys { get; set; }
 
-        public TSeaechKey()
+
+        public TData()
         {
+            FinalList = new List<TProfile>();
         }
 
-        public TSeaechKey(string query)
-        {
-
-            MainCategory = mainCategory;
-            SubCategory = subCategory;
-            SearchKeys = searchKeys;
-            Hashtags = hashtags;
-        }
-
-        public string MainCategory { get => mainCategory; set => mainCategory = value; }
-        public string SubCategory { get => subCategory; set => subCategory = value; }
-        public string[] SearchKeys { get => searchKeys; set => searchKeys = value; }
-        public string[] Hashtags { get => hashtags; set => hashtags = value; }
     }
 }
