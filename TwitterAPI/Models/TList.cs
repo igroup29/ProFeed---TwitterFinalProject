@@ -1,31 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
+
 
 namespace TwitterAPI.Models
 {
     public class TList
     {
-        private int listID;
-        private int userID;
-        //private DateTime lastModified;
-        private double listAVGRank;
-        private List<TProfile> matchingProfiles;
-        // bare in mind - model for product with the following instances.
-        private string product;
-        private string majorCategory;
-        private string secondCategory;
-        private string subCategory;
 
-        public int ListID { get => listID; set => listID = value; }
-        public int UserID { get => userID; set => userID = value; }
-        public double ListAVGRank { get => listAVGRank; set => listAVGRank = value; }
-        public List<TProfile> MatchingProfiles { get => matchingProfiles; set => matchingProfiles = value; }
-        public string Product { get => product; set => product = value; }
-        public string MajorCategory { get => majorCategory; set => majorCategory = value; }
-        public string SecondCategory { get => secondCategory; set => secondCategory = value; }
-        public string SubCategory { get => subCategory; set => subCategory = value; }
+        public int ListID { get; set; }
+        public int UserID { get; set; }
+        public double ListAVGRank { get; set; }
+        public List<TProfile> MatchingProfiles { get; set; }
+        public string Product { get; set; }
+        public string MajorCategory { get; set; }
+        public string SecondCategory { get; set; }
+        public string SubCategory { get; set; }
 
         public TList()
         {

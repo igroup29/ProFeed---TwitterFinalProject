@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Threading;
 using System.Threading.Tasks;
 using Tweetinvi;
 using Tweetinvi.Parameters;
 using Tweetinvi.Exceptions;
-using Tweetinvi.Events;
 using Tweetinvi.Models;
-using Tweetinvi.Parameters.Enum;
-using Tweetinvi.Parameters.V2;
+
 
 namespace TwitterAPI.Models
 {
@@ -20,16 +14,16 @@ namespace TwitterAPI.Models
         const string AccessTokenSecret = "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG";
         const string AccessToken = "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
         const string ApiKeySecret = "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
-        public TwitterClient tc;
+        public TwitterClient Client { get; set; }
 
         public TwitterModel()
         {
-            tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+            Client = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
      
         }
         public void UpdateTwitterClient()
         {
-            tc = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+            Client = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
         }
 
         public async Task<ITweet[]> GetTwittsByQuery(string Query, int RetweetMin)
@@ -37,7 +31,7 @@ namespace TwitterAPI.Models
             // some code to illustrate how to catch Tweetinvi exceptions.
             try
             {
-                var user = await tc.Users.GetAuthenticatedUserAsync();
+                var user = await Client.Users.GetAuthenticatedUserAsync();
                 string newQuery = Query.Replace("HASHTAG", "#");
                 // var parameters = new SearchTweetsParameters("#UNBOXING tech min_retweets:2")     
                 var parameters = new SearchTweetsParameters(newQuery + " min_retweets:" + RetweetMin)
@@ -47,8 +41,8 @@ namespace TwitterAPI.Models
                     SearchType = SearchResultType.Mixed,
                     TweetMode = TweetMode.Extended,
                 };
-                tc.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
-                return await tc.Search.SearchTweetsAsync(parameters);
+                Client.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
+                return await Client.Search.SearchTweetsAsync(parameters);
             }
             catch (TwitterException te)
             {
@@ -69,9 +63,9 @@ namespace TwitterAPI.Models
             //
             try
             {
-                tc.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
-                tc.Config.HttpRequestTimeout = TimeSpan.FromSeconds(60);
-                return await tc.Timelines.GetUserTimelineAsync(potInfluencer.Id);
+                Client.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
+                Client.Config.HttpRequestTimeout = TimeSpan.FromSeconds(60);
+                return await Client.Timelines.GetUserTimelineAsync(potInfluencer.Id);
             }catch(Exception ex)
             {
                 var exeption  = ex.ToString();
@@ -83,8 +77,8 @@ namespace TwitterAPI.Models
         {
             try
             {
-                tc.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
-                return await tc.Users.GetFriendsAsync(id);
+                Client.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
+                return await Client.Users.GetFriendsAsync(id);
             }catch(Exception ex)
             {
                 var exeption = ex.ToString();
@@ -92,14 +86,18 @@ namespace TwitterAPI.Models
             }
         }
 
-        public async Task<object> GetUserByID(IUser user)
+        public async Task<IUser> GetUserByID(long userId)
         {
             try
             {
-                tc.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
-                var userResult = await tc.UsersV2.GetUserByIdAsync(user.Id);
-                return userResult.User;
-            }catch(Exception ex)
+                Client.Config.RateLimitTrackerMode = RateLimitTrackerMode.TrackAndAwait;
+                Client.Config.HttpRequestTimeout = TimeSpan.FromSeconds(60);
+                //var userResult = await tc.UsersV2.GetUserByIdAsync(user.Id);
+                //return userResult.User;
+                var tweetinviUser = await Client.Users.GetUserAsync(userId);
+                return tweetinviUser;
+            }
+            catch(Exception ex)
             {
                 var exeption = ex.ToString();
                 return null;

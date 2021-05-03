@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Threading.Tasks;
-using Tweetinvi;
-using Tweetinvi.Parameters;
-using Tweetinvi.Models;
-using Tweetinvi.Parameters.Enum;
-using Tweetinvi.Parameters.V2;
+﻿using System.Collections.Generic;
+
 
 namespace TwitterAPI.Models
 {
     public class TUser 
     {
-        private int userID;
-        private string email;
-        private string userName;
-        private string image;
-      
+
+        public int UserID { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string Image { get; set; }
 
         public TUser() {}
 
@@ -29,10 +21,7 @@ namespace TwitterAPI.Models
             Image = image;
         }
 
-        public int UserID { get => userID; set => userID = value; }
-        public string Email { get => email; set => email = value; }
-        public string UserName { get => userName; set => userName = value; }
-        public string Image { get => image; set => image = value; }
+       
 
         public int InsertUser(TUser user)
         {

@@ -102,40 +102,54 @@ namespace TwitterAPI.Models
            
             return new List<IUser>();
         }
+   
 
         public double IsProfetional(ITweet[] tweets,ArrayList query,TProfile profile)
         {
+            //(#replies+#retweets)/#followers*100
+            double engagementRate = 0;
+
             int tweetsCounter = 0;
             int retweetCounter = 0;
             int inCalculationCounter = 0;
             double returnCalculation = 0;
-            string insertToStack = "Number of tweets in timeline:" + tweets.Length;
+            profile.TimelineCount = tweets.Length;
+            string insertToStack = "Number of tweets in timeline:" + profile.TimelineCount;
             profile.StackTrace.Add(insertToStack);
             try
             {
                 foreach (ITweet tweet in tweets)
                 {
-                    if (tweet.Hashtags.Count != 0 && tweet.IsRetweet == false)
+                    if (tweet.IsRetweet == false)
                     {
-                        inCalculationCounter++;
-                        if (tweet.Retweeted == true)
+                        profile.OriginalTweets++;
+                        double replyCount = 0;
+                        if (tweet.ReplyCount != null)
+                            replyCount = (double)tweet.ReplyCount;
+                        engagementRate = 100 * ((double)tweet.RetweetCount + replyCount) / tweet.CreatedBy.FollowersCount;                    
+                        profile.TweetsEngagmentRate += engagementRate;
+                        if (tweet.Hashtags.Count != 0)
                         {
-                            retweetCounter++;
-                            tweetsCounter += 3;
-                        }
-                        var hashTagsToCheck = new ArrayList();
-                        foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
-                        {
-                            hashTagsToCheck.Add(entity.Text);
-                        }
-                        foreach (string q in query)
-                        {
-                            foreach (string hashtag in hashTagsToCheck.ToArray())
+                            inCalculationCounter++;
+                            if (tweet.Retweeted == true)
                             {
-                                if (q.Equals(hashtag.ToLower()))
+                                retweetCounter++;
+                                tweetsCounter += 3;
+                            }
+                            var hashTagsToCheck = new ArrayList();
+                            foreach (Tweetinvi.Models.Entities.IHashtagEntity entity in tweet.Hashtags)
+                            {
+                                hashTagsToCheck.Add(entity.Text);
+                            }
+                            foreach (string q in query)
+                            {
+                                foreach (string hashtag in hashTagsToCheck.ToArray())
                                 {
-                                    tweetsCounter++;
-                                    hashTagsToCheck.Remove(hashtag);
+                                    if (q.Equals(hashtag.ToLower()))
+                                    {
+                                        tweetsCounter++;
+                                        hashTagsToCheck.Remove(hashtag);
+                                    }
                                 }
                             }
                         }
@@ -157,7 +171,7 @@ namespace TwitterAPI.Models
             profile.StackTrace.Add(insertToStack);
             insertToStack = "Number of Tweets contaning query:" + tweetsCounter;
             profile.StackTrace.Add(insertToStack);
-            insertToStack = "Number of ReTweets:" + retweetCounter;
+            insertToStack = "Number of ReTweeted tweets:" + retweetCounter;
             profile.StackTrace.Add(insertToStack);
 
             if (inCalculationCounter * AMPLIFIER < tweets.Length)
@@ -171,19 +185,19 @@ namespace TwitterAPI.Models
             var keys = query.Split(';');
         }
 
-        public ArrayList RankingStage(List<IUser> FinalList)
+        public void RankingStage(IUser user,TProfile profile)
         {
-            ArrayList InfluencerArray = new ArrayList();
-
-           
-          
-            //Collect RT/FT/FOLLOWERS/FRIENDS and calculate General activity
-            for (int i = 0; i < FinalList.Count; i++)
-            {
-
-            }
-
-            return InfluencerArray;
+            //engagement -> (total engagement/ impact)*100
+            if (profile.OriginalTweets != 0 )
+                profile.Engagment = 100 * profile.TweetsEngagmentRate / profile.OriginalTweets;
+            //impact/impressions ->followers*originalTweets
+            profile.Impact = profile.Followers * profile.OriginalTweets;
+            //general activity -> (originalTweets+replies+retweets)/number of tweets
+            int replyCount = 0;
+            if (user.Status.ReplyCount != null)
+                replyCount = (int)user.Status.ReplyCount;
+            if(profile.TimelineCount!=0)
+                profile.GeneralActivity = (profile.OriginalTweets + replyCount + user.Status.RetweetCount)/profile.TimelineCount;
         }
 
         public void ClearLists()

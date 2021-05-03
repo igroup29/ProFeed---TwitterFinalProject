@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Threading.Tasks;
 using System.Threading;
-using Tweetinvi;
-using Tweetinvi.Parameters;
 using Tweetinvi.Models;
-using Tweetinvi.Parameters.Enum;
-using Tweetinvi.Parameters.V2;
-using System.Collections;
+
 
 namespace TwitterAPI.Models
 {
@@ -17,76 +12,100 @@ namespace TwitterAPI.Models
     {
         const double PRORANGE = 0.35;
         const double MINRANGE = 0.25;
-        private string[] searchQuery = { "fintech", "stockExchange", "forex" };
 
-        //var inf = alg.PreliminaryFiltering(tweets);
-        public ProFeedAlg ProFeedAlg { get; set; }
-        public TwitterModel TwitterModel { get; set; }
+        private string[] searchQuery = { "fintech", "stockExchange", "forex" };
+        private SemaphoreSlim taskSemaphore = new SemaphoreSlim(1, 1);
+
+        public ProFeedAlg ProFeedAlgorithm { get; set; }
+        public TwitterModel ProFeedTwitterModel { get; set; }
         public TData SearchData { get; set; }
 
         public ProFeedApp()
         {
-            ProFeedAlg = new ProFeedAlg();
-            TwitterModel = new TwitterModel();
+            ProFeedAlgorithm = new ProFeedAlg();
+            ProFeedTwitterModel = new TwitterModel();
             SearchData = new TData();
             SearchData.SearchKeys.AddRange(searchQuery);
 
         }
+        //unresolved
         public ProFeedApp(string query)
         {
-            ProFeedAlg = new ProFeedAlg();
-            TwitterModel = new TwitterModel();
+            ProFeedAlgorithm = new ProFeedAlg();
+            ProFeedTwitterModel = new TwitterModel();
             SearchData = new TData();
             //to be continued, with search keys from controller
         }
 
-        
-
-        public async Task Work(IUser user,int index)
+        //was work before
+        public async Task InfluencersToProfile(IUser user,int index)
         {
             try
             {
-                var timeline = await TwitterModel.GetUserTimeline(user);
-                //need to test
+                var timeline = await ProFeedTwitterModel.GetUserTimeline(user);
+                var fullUser = await ProFeedTwitterModel.GetUserByID(user.Id);
+                //need to test                
+                await taskSemaphore.WaitAsync();
                 SearchData.FinalList.Add(new TProfile());
-                var inBusiness = ProFeedAlg.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
+                var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
-                InsertDataToTProfile(user,index);
+                InsertDataToTProfile(user, index);
                 if (inBusiness > MINRANGE)
                 {
                     SearchData.FinalList.Last().Profetional = true;
-                    if (!ProFeedAlg.Profetionals.Equals(user))
+                    if (!ProFeedAlgorithm.Profetionals.Equals(user))
                     {
-                        if (ProFeedAlg.Profetionals.Count > 4)
-                            ProFeedAlg.Profetionals.RemoveAt(0);
-                        ProFeedAlg.Profetionals.Add(user);
+                        if (ProFeedAlgorithm.Profetionals.Count > 4)
+                            ProFeedAlgorithm.Profetionals.RemoveAt(0);
+                        ProFeedAlgorithm.Profetionals.Add(user);
                     }
 
                 }
+                ProFeedAlgorithm.RankingStage(fullUser,SearchData.FinalList.Last());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+            finally
+            {
+                taskSemaphore.Release();
+
+            }
+
         }
-        public async Task Work2(IUser user, int index)
+        //was work2 before
+        public async Task InfluencersFriendsSearch(IUser user, int index)
         {
             try
             {
-                var timeline = await TwitterModel.GetUserTimeline(user);
+                var timeline = await ProFeedTwitterModel.GetUserTimeline(user);
+                var fullUser = await ProFeedTwitterModel.GetUserByID(user.Id);
+
                 //need to test
+                await taskSemaphore.WaitAsync();
                 SearchData.FinalList.Add(new TProfile());
-                var inBusiness = ProFeedAlg.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
+                var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
                 if (inBusiness > PRORANGE)
                 {
                     InsertDataToTProfile(user,index);
                     SearchData.FinalList.Last().Profetional = true;
+                    ProFeedAlgorithm.RankingStage(fullUser, SearchData.FinalList.Last());
+
+                }
+                else
+                {
+                    SearchData.FinalList.Remove(SearchData.FinalList.Last());
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                taskSemaphore.Release();
             }
         }
 
@@ -95,6 +114,7 @@ namespace TwitterAPI.Models
             Task step2 = Task.WhenAll(tasks.ToArray());
             await step2;
         }
+
         public void InsertDataToTProfile(IUser user,int index)
         {
             SearchData.FinalList.Last().ProfileID = user.Id;
@@ -107,7 +127,6 @@ namespace TwitterAPI.Models
             SearchData.FinalList.Last().Website = user.Url;        
             SearchData.FinalList.Last().Description = user.Description;
             SearchData.FinalList.Last().Location = user.Location;
-            SearchData.FinalList.Last().Reach = ProFeedAlg.InfluencersDagree[index];
         }
 
         public async Task<TData> StartSearch(string query, int reTweeTwitterModelin)
@@ -115,17 +134,18 @@ namespace TwitterAPI.Models
             //step 1 -
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
-            var tweets = await TwitterModel.GetTwittsByQuery(query, reTweeTwitterModelin);
+            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(query, reTweeTwitterModelin);
 
-            var influencers = ProFeedAlg.PreliminaryFiltering(tweets);
+            var influencers = ProFeedAlgorithm.PreliminaryFiltering(tweets);
             //step 2 - 
             List<Task> threads = new List<Task>();
             int influencerIndex = 0;
+      
             foreach (IUser iUser in influencers)
             {
                 //await TwitterModel.GetUserTimeline(iUser);
                 influencerIndex = influencers.IndexOf(iUser);
-                var newTaskToAdd = Task.Factory.StartNew(async()=>await Work(iUser, influencerIndex));
+                var newTaskToAdd = Task.Factory.StartNew(async()=>await InfluencersToProfile(iUser, influencerIndex));
                 threads.Add(newTaskToAdd.Unwrap());
             }
             try
@@ -138,15 +158,15 @@ namespace TwitterAPI.Models
             }
             //works to here 11-04-21
             //step 3-
-            ProFeedAlg.ClearLists();
+            ProFeedAlgorithm.ClearLists();
             threads.Clear();
-            foreach (IUser user in ProFeedAlg.Profetionals)
+            foreach (IUser user in ProFeedAlgorithm.Profetionals)
             {
                // TwitterModel.UpdateTwitterClient();
                 try
                 {
-                    var userFriends = await TwitterModel.GetUserFriends(user.Id);
-                    influencers = ProFeedAlg.PreliminaryFiltering(userFriends);
+                    var userFriends = await ProFeedTwitterModel.GetUserFriends(user.Id);
+                    influencers = ProFeedAlgorithm.PreliminaryFiltering(userFriends);
                 }
                 catch (Exception ex)
                 {
@@ -155,13 +175,13 @@ namespace TwitterAPI.Models
                 foreach (IUser iUser in influencers)
                 {
                     influencerIndex = influencers.IndexOf(iUser);
-                    var temp = Task.Factory.StartNew(async () => await Work2(iUser, influencerIndex));
+                    var temp = Task.Factory.StartNew(async () => await InfluencersFriendsSearch(iUser, influencerIndex));
                     threads.Add(temp);
                 }
                 try
                 {
                     await WaitAllTasks(threads);
-                    ProFeedAlg.ClearLists();
+                    ProFeedAlgorithm.ClearLists();
                     threads.Clear();
                 }
                 catch (Exception ex)
