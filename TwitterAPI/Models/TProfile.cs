@@ -25,8 +25,8 @@ namespace TwitterAPI.Models
         public int OriginalTweets { get; set; }
         public double TweetsEngagmentRate { get; set; }
 
-        public Double Engagment { get; set; }
-        public Double GeneralActivity { get; set; }
+        public double Engagment { get; set; }
+        public double GeneralActivity { get; set; }
         public double Rank { get; set; }
 
         public ArrayList StackTrace {get;set;}

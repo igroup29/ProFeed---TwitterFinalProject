@@ -134,9 +134,15 @@ namespace TwitterAPI.Models
             //step 1 -
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
+
             var tweets = await ProFeedTwitterModel.GetTwittsByQuery(query, reTweeTwitterModelin);
+            insertToAppStackTrace = "Number of tweet in initial request:" + tweets.Length;
+            SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
             var influencers = ProFeedAlgorithm.PreliminaryFiltering(tweets);
+            insertToAppStackTrace = "Number of Influencers after preliminary filtering:" + influencers.Count;
+            SearchData.AppStackTrace.Add(insertToAppStackTrace);
+
             //step 2 - 
             List<Task> threads = new List<Task>();
             int influencerIndex = 0;
@@ -158,15 +164,25 @@ namespace TwitterAPI.Models
             }
             //works to here 11-04-21
             //step 3-
+            insertToAppStackTrace = "Number of Influencers with potential influencers friends:" + ProFeedAlgorithm.Profetionals.Count;
+            SearchData.AppStackTrace.Add(insertToAppStackTrace);
+
             ProFeedAlgorithm.ClearLists();
             threads.Clear();
+            int influencerCount = SearchData.FinalList.Count;
+            int potentialInfluencerIndex = 1;
             foreach (IUser user in ProFeedAlgorithm.Profetionals)
             {
                // TwitterModel.UpdateTwitterClient();
                 try
                 {
                     var userFriends = await ProFeedTwitterModel.GetUserFriends(user.Id);
+                    insertToAppStackTrace = "Number of friends for influencer" +potentialInfluencerIndex +":" + userFriends.Length;
+                    SearchData.AppStackTrace.Add(insertToAppStackTrace);    
+                    
                     influencers = ProFeedAlgorithm.PreliminaryFiltering(userFriends);
+                    insertToAppStackTrace = "Number of potential influencers from Influencer" + potentialInfluencerIndex + " friends:" + influencers.Count;
+                    SearchData.AppStackTrace.Add(insertToAppStackTrace);
                 }
                 catch (Exception ex)
                 {
@@ -183,12 +199,18 @@ namespace TwitterAPI.Models
                     await WaitAllTasks(threads);
                     ProFeedAlgorithm.ClearLists();
                     threads.Clear();
+                    insertToAppStackTrace = "Number of new influencers from Influencer" + potentialInfluencerIndex + " friends:" + (SearchData.FinalList.Count - influencerCount);
+                    SearchData.AppStackTrace.Add(insertToAppStackTrace);
+                    potentialInfluencerIndex++;
+                    influencerCount = SearchData.FinalList.Count;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
             }
+            insertToAppStackTrace = "Final number of influencers" + SearchData.FinalList.Count;
+            SearchData.AppStackTrace.Add(insertToAppStackTrace);
             return SearchData;
         }
     }
