@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-
+using System.Collections.Generic;
 
 namespace TwitterAPI.Models
 {
@@ -30,6 +30,7 @@ namespace TwitterAPI.Models
         public double Rank { get; set; }
 
         public ArrayList StackTrace {get;set;}
+        public List<string> StackTraceList { get; set; }
         //category will obligate relation table in DB
         //public List<string> Categories { get; set; }
 
@@ -43,6 +44,8 @@ namespace TwitterAPI.Models
             TweetsEngagmentRate = 0;
             Profetional = false;
             StackTrace = new ArrayList();
+            StackTraceList = new List<string>();
+
         }
 
         public TProfile(long id,string name,string screenName,bool verified)

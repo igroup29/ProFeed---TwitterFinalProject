@@ -12,6 +12,9 @@ namespace TwitterAPI.Models
         const int MAXFOLLOWERS = 1000000;
         const int MINFOLLOWERS = 5000;
         const int AMPLIFIER = 5;
+        private string[] stackTraceTitels = { "Number of tweets in timeline:","Calculated Tweets:", "Number of Tweets contaning query:", "Number of ReTweeted tweets:" };
+        private List<double> stackTraceMeasures = new List<double>();
+
         public List<IUser> Influencers { get; set; }
         public int AlgoLevel { get; set; }
         public List<int> InfluencersDagree { get; set; }
@@ -108,14 +111,13 @@ namespace TwitterAPI.Models
         {
             //(#replies+#retweets)/#followers*100
             double engagementRate = 0;
-
+            stackTraceMeasures.Clear();
             int tweetsCounter = 0;
             int retweetCounter = 0;
             int inCalculationCounter = 0;
             double returnCalculation = 0;
             profile.TimelineCount = tweets.Length;
-            string insertToStack = "Number of tweets in timeline:" + profile.TimelineCount;
-            profile.StackTrace.Add(insertToStack);
+            stackTraceMeasures.Add(profile.TimelineCount);
             try
             {
                 foreach (ITweet tweet in tweets)
@@ -166,19 +168,26 @@ namespace TwitterAPI.Models
             {
                 Console.WriteLine(ex.Message);
             }
-            //Inserting dats to profile stackTrace
-            insertToStack = "Calculated Tweets:" +inCalculationCounter;
-            profile.StackTrace.Add(insertToStack);
-            insertToStack = "Number of Tweets contaning query:" + tweetsCounter;
-            profile.StackTrace.Add(insertToStack);
-            insertToStack = "Number of ReTweeted tweets:" + retweetCounter;
-            profile.StackTrace.Add(insertToStack);
+
+            //{ "Number of tweets in timeline:", "Calculated Tweets:", "Number of Tweets contaning query:", "Number of ReTweeted tweets:" };
+
+            stackTraceMeasures.Add(inCalculationCounter);
+            stackTraceMeasures.Add(tweetsCounter);
+            stackTraceMeasures.Add(retweetCounter);
+
 
             if (inCalculationCounter * AMPLIFIER < tweets.Length)
                 return 0;
+            for(int i =0;i<stackTraceTitels.Length;i++)
+            {
+                profile.StackTraceList.Add(""+stackTraceTitels[i]+stackTraceMeasures[i]);
+            }
             return returnCalculation;
 
+
         }
+
+    
         //unresolved, mayby not relevant
         public void QuerySearchKeys(string query)
         {

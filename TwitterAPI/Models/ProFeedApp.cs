@@ -211,6 +211,7 @@ namespace TwitterAPI.Models
             }
             insertToAppStackTrace = "Final number of influencers" + SearchData.FinalList.Count;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
+            
             return SearchData;
         }
     }
