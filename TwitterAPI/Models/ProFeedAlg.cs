@@ -12,8 +12,7 @@ namespace TwitterAPI.Models
         const int MAXFOLLOWERS = 1000000;
         const int MINFOLLOWERS = 5000;
         const int AMPLIFIER = 5;
-        private string[] stackTraceTitels = { "Number of tweets in timeline:","Calculated Tweets:", "Number of Tweets contaning query:", "Number of ReTweeted tweets:" };
-        private List<double> stackTraceMeasures = new List<double>();
+        
 
         public List<IUser> Influencers { get; set; }
         public int AlgoLevel { get; set; }
@@ -110,14 +109,12 @@ namespace TwitterAPI.Models
         public double IsProfetional(ITweet[] tweets,ArrayList query,TProfile profile)
         {
             //(#replies+#retweets)/#followers*100
-            double engagementRate = 0;
-            stackTraceMeasures.Clear();
+            double engagementRate = 0;       
             int tweetsCounter = 0;
             int retweetCounter = 0;
             int inCalculationCounter = 0;
             double returnCalculation = 0;
             profile.TimelineCount = tweets.Length;
-            stackTraceMeasures.Add(profile.TimelineCount);
             try
             {
                 foreach (ITweet tweet in tweets)
@@ -171,17 +168,15 @@ namespace TwitterAPI.Models
 
             //{ "Number of tweets in timeline:", "Calculated Tweets:", "Number of Tweets contaning query:", "Number of ReTweeted tweets:" };
 
-            stackTraceMeasures.Add(inCalculationCounter);
-            stackTraceMeasures.Add(tweetsCounter);
-            stackTraceMeasures.Add(retweetCounter);
+            profile.StackTrace.Number_of_tweets_in_timeline = profile.TimelineCount;
+            profile.StackTrace.Calculated_Tweets = inCalculationCounter;
+            profile.StackTrace.Number_of_Tweets_contaning_query = tweetsCounter;
+            profile.StackTrace.Number_of_ReTweeted_tweets = retweetCounter;
 
 
             if (inCalculationCounter * AMPLIFIER < tweets.Length)
                 return 0;
-            for(int i =0;i<stackTraceTitels.Length;i++)
-            {
-                profile.StackTraceList.Add(""+stackTraceTitels[i]+stackTraceMeasures[i]);
-            }
+        
             return returnCalculation;
 
 
@@ -198,7 +193,7 @@ namespace TwitterAPI.Models
         {
             //engagement -> (total engagement/ impact)*100
             if (profile.OriginalTweets != 0 )
-                profile.Engagment = 100 * profile.TweetsEngagmentRate / profile.OriginalTweets;
+                profile.Engagment = Math.Round((100 * profile.TweetsEngagmentRate / profile.OriginalTweets),2);
             //impact/impressions ->followers*originalTweets
             profile.Impact = profile.Followers * profile.OriginalTweets;
             //general activity -> (originalTweets+replies+retweets)/number of tweets
@@ -206,7 +201,14 @@ namespace TwitterAPI.Models
             if (user.Status.ReplyCount != null)
                 replyCount = (int)user.Status.ReplyCount;
             if(profile.TimelineCount!=0)
-                profile.GeneralActivity = (profile.OriginalTweets + replyCount + user.Status.RetweetCount)/profile.TimelineCount;
+                profile.GeneralActivity = Math.Round(((double)(profile.OriginalTweets + replyCount + user.Status.RetweetCount)/profile.TimelineCount),2);
+
+            RankFinalStage(profile);
+        }
+
+        public void RankFinalStage(TProfile profile)
+        {
+
         }
 
         public void ClearLists()

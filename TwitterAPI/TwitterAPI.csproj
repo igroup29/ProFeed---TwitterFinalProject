@@ -219,6 +219,7 @@
     <Compile Include="Models\DAL\DBservices.cs" />
     <Compile Include="Models\ProFeedAlg.cs" />
     <Compile Include="Models\ProFeedApp.cs" />
+    <Compile Include="Models\ProfileStackTrace.cs" />
     <Compile Include="Models\TList.cs" />
     <Compile Include="Models\TProfile.cs" />
     <Compile Include="Models\TData.cs" />

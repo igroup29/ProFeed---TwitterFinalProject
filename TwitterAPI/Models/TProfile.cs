@@ -29,8 +29,8 @@ namespace TwitterAPI.Models
         public double GeneralActivity { get; set; }
         public double Rank { get; set; }
 
-        public ArrayList StackTrace {get;set;}
-        public List<string> StackTraceList { get; set; }
+        public ProfileStackTrace StackTrace {get;set;}
+        
         //category will obligate relation table in DB
         //public List<string> Categories { get; set; }
 
@@ -43,9 +43,8 @@ namespace TwitterAPI.Models
             GeneralActivity = 0;
             TweetsEngagmentRate = 0;
             Profetional = false;
-            StackTrace = new ArrayList();
-            StackTraceList = new List<string>();
-
+            StackTrace = new ProfileStackTrace();
+            
         }
 
         public TProfile(long id,string name,string screenName,bool verified)
@@ -60,4 +59,6 @@ namespace TwitterAPI.Models
         }
 
     }
+    
+
 }
