@@ -18,14 +18,14 @@ namespace TwitterAPI.Controllers
 
         [HttpGet]
         [Route("api/Twitter")]
-        public async Task<TData> GetAsync([FromUri] string request, [FromUri] int RetweetMin)
+        public async Task<TData> GetAsync([FromUri] string request)
         {
             try
             {
                 //TwitterModel myModel = new TwitterModel();
                 //return await myModel.GetTwittsByQuery(request, RetweetMin);
                 //  return await proFeedApp.StartSearch(request, RetweetMin);
-                return await proFeedApp.StartSearch(request, RetweetMin);
+                return await proFeedApp.StartSearch(request);
 
             }
             catch (Exception ex)
