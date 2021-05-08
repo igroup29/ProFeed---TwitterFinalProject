@@ -17,6 +17,10 @@ namespace TwitterAPI.Models
         public string Location { get; set; }
         public int Followers { get; set; }// also considered as reach
         public int TimelineCount { get; set; }
+        public int CalculatedTweets { get; set; }
+        public int QueryIncludedTweets { get; set; }
+        public int RetweetedTweets { get; set; }
+
         public bool IsVerified { get; set; }
         public string Image { get; set; }
         //from algorithm
@@ -28,8 +32,8 @@ namespace TwitterAPI.Models
         public double Engagment { get; set; }
         public double GeneralActivity { get; set; }
         public double Rank { get; set; }
-
-        public ProfileStackTrace StackTrace {get;set;}
+        
+       // public ProfileStackTrace StackTrace {get;set;}
         
         //category will obligate relation table in DB
         //public List<string> Categories { get; set; }
@@ -43,7 +47,7 @@ namespace TwitterAPI.Models
             GeneralActivity = 0;
             TweetsEngagmentRate = 0;
             Profetional = false;
-            StackTrace = new ProfileStackTrace();
+            //StackTrace = new ProfileStackTrace();
             
         }
 
