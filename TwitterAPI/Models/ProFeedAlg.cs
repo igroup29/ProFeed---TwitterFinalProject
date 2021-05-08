@@ -99,13 +99,6 @@ namespace TwitterAPI.Models
             }
         }
 
-        public List<IUser> SecondFilter(ITweet[] potInfluencers)
-        {
-           
-            return new List<IUser>();
-        }
-   
-
         public double IsProfetional(ITweet[] tweets,ArrayList query,TProfile profile)
         {
             //(#replies+#retweets)/#followers*100
@@ -184,9 +177,10 @@ namespace TwitterAPI.Models
 
     
         //unresolved, mayby not relevant
-        public void QuerySearchKeys(string query)
+        public string[] QuerySearchKeys(string query)
         {
-            var keys = query.Split(';');
+            var keys = query.Split(',');
+            return keys;
         }
 
         public void RankingStage(IUser user,TProfile profile)

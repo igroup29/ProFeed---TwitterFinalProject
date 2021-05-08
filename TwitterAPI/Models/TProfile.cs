@@ -58,6 +58,13 @@ namespace TwitterAPI.Models
 
         }
 
+
+        public bool ProfileEquals(long id)
+        {
+            if (id == ProfileID)
+                return true;
+            return false;
+        }
     }
     
 

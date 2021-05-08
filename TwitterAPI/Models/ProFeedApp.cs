@@ -10,10 +10,11 @@ namespace TwitterAPI.Models
 {
     public class ProFeedApp
     {
-        const double PRORANGE = 0.35;
-        const double MINRANGE = 0.25;
-
-        private string[] searchQuery = { "fintech", "stockExchange", "forex" };
+        const double PRO_RANGE = 0.35;
+        const double MIN_RANGE = 0.25;
+        const int MINIMUM_RETWEETS = 5;
+        //private string[] searchQuery = { "fintech", "stockExchange", "forex" };
+        private string[] searchQuery;
         private SemaphoreSlim taskSemaphore = new SemaphoreSlim(1, 1);
 
         public ProFeedAlg ProFeedAlgorithm { get; set; }
@@ -50,7 +51,7 @@ namespace TwitterAPI.Models
                 var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
                 InsertDataToTProfile(user, index);
-                if (inBusiness > MINRANGE)
+                if (inBusiness > MIN_RANGE)
                 {
                     SearchData.FinalList.Last().Profetional = true;
                     if (!ProFeedAlgorithm.Profetionals.Equals(user))
@@ -84,11 +85,13 @@ namespace TwitterAPI.Models
 
                 //need to test
                 await taskSemaphore.WaitAsync();
+                
                 SearchData.FinalList.Add(new TProfile());
                 var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
-                if (inBusiness > PRORANGE)
+                if (inBusiness > PRO_RANGE)
                 {
+                    
                     InsertDataToTProfile(user,index);
                     SearchData.FinalList.Last().Profetional = true;
                     ProFeedAlgorithm.RankingStage(fullUser, SearchData.FinalList.Last());
@@ -115,6 +118,16 @@ namespace TwitterAPI.Models
             await step2;
         }
 
+        public bool CheckIfProfileExist(long id)
+        {
+            foreach(TProfile profile in SearchData.FinalList)
+            {
+                if (profile.ProfileEquals(id))
+                    return false;
+            }
+            return true; 
+        }
+
         public void InsertDataToTProfile(IUser user,int index)
         {
             SearchData.FinalList.Last().ProfileID = user.Id;
@@ -129,13 +142,14 @@ namespace TwitterAPI.Models
             SearchData.FinalList.Last().Location = user.Location;
         }
 
-        public async Task<TData> StartSearch(string query, int reTweeTwitterModelin)
+        public async Task<TData> StartSearch(string query)
         {
             //step 1 -
+            searchQuery = ProFeedAlgorithm.QuerySearchKeys(query);
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
-            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(query, reTweeTwitterModelin);
+            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(searchQuery[searchQuery.Length-1], MINIMUM_RETWEETS);
             insertToAppStackTrace = "Number of tweet in initial request:" + tweets.Length;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
