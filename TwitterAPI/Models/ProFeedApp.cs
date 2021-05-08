@@ -26,8 +26,6 @@ namespace TwitterAPI.Models
             ProFeedAlgorithm = new ProFeedAlg();
             ProFeedTwitterModel = new TwitterModel();
             SearchData = new TData();
-            SearchData.SearchKeys.AddRange(searchQuery);
-
         }
         //unresolved
         public ProFeedApp(string query)
@@ -146,10 +144,11 @@ namespace TwitterAPI.Models
         {
             //step 1 -
             searchQuery = ProFeedAlgorithm.QuerySearchKeys(query);
+            SearchData.SearchKeys.AddRange(searchQuery);
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
-            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(searchQuery[searchQuery.Length-1], MINIMUM_RETWEETS);
+            var tweets = await ProFeedTwitterModel.GetTwittsByQuery((string)SearchData.SearchKeys[(SearchData.SearchKeys.Count-1)], MINIMUM_RETWEETS);
             insertToAppStackTrace = "Number of tweet in initial request:" + tweets.Length;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
