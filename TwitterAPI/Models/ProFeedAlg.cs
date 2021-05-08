@@ -191,18 +191,24 @@ namespace TwitterAPI.Models
 
         public void RankingStage(IUser user,TProfile profile)
         {
+            double calculationSupport = 0;
             //engagement -> (total engagement/ impact)*100
-            if (profile.OriginalTweets != 0 )
-                profile.Engagment = Math.Round((100 * profile.TweetsEngagmentRate / profile.OriginalTweets),2);
+            if (profile.OriginalTweets != 0)
+            {
+                calculationSupport = Math.Round((100 * profile.TweetsEngagmentRate / profile.OriginalTweets), 2);
+                profile.Engagment = calculationSupport;
+            }
             //impact/impressions ->followers*originalTweets
             profile.Impact = profile.Followers * profile.OriginalTweets;
             //general activity -> (originalTweets+replies+retweets)/number of tweets
             int replyCount = 0;
             if (user.Status.ReplyCount != null)
                 replyCount = (int)user.Status.ReplyCount;
-            if(profile.TimelineCount!=0)
-                profile.GeneralActivity = Math.Round(((double)(profile.OriginalTweets + replyCount + user.Status.RetweetCount)/profile.TimelineCount),2);
-
+            if (profile.TimelineCount != 0)
+            {
+                calculationSupport = Math.Round(((double)(profile.OriginalTweets + replyCount + user.Status.RetweetCount) / profile.TimelineCount), 2);
+                profile.GeneralActivity = calculationSupport;
+            }
             RankFinalStage(profile);
         }
 

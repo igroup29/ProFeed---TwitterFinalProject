@@ -54,7 +54,7 @@ namespace TwitterAPI.Models
             ScreenName = screenName;
             Profetional = false;
             IsVerified = verified;
-            StackTrace = new ArrayList();
+            StackTrace = new ProfileStackTrace();
 
         }
 
