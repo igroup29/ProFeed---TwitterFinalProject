@@ -168,10 +168,10 @@ namespace TwitterAPI.Models
 
             //{ "Number of tweets in timeline:", "Calculated Tweets:", "Number of Tweets contaning query:", "Number of ReTweeted tweets:" };
 
-            profile.StackTrace.Number_of_tweets_in_timeline = profile.TimelineCount;
-            profile.StackTrace.Calculated_Tweets = inCalculationCounter;
-            profile.StackTrace.Number_of_Tweets_contaning_query = tweetsCounter;
-            profile.StackTrace.Number_of_ReTweeted_tweets = retweetCounter;
+            profile.StackTrace.TimelineTweets = profile.TimelineCount;
+            profile.StackTrace.CalculatedTweets = inCalculationCounter;
+            profile.StackTrace.QueryIncludedTweets = tweetsCounter;
+            profile.StackTrace.RetweetedTweets = retweetCounter;
 
 
             if (inCalculationCounter * AMPLIFIER < tweets.Length)
