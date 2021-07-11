@@ -47,7 +47,6 @@ namespace TwitterAPI.Models
             GeneralActivity = 0;
             TweetsEngagmentRate = 0;
             Profetional = false;
-            //StackTrace = new ProfileStackTrace();
             
         }
 
@@ -58,7 +57,6 @@ namespace TwitterAPI.Models
             ScreenName = screenName;
             Profetional = false;
             IsVerified = verified;
-            StackTrace = new ProfileStackTrace();
 
         }
 
