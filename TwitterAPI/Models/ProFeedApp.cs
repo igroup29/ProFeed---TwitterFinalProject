@@ -10,9 +10,9 @@ namespace TwitterAPI.Models
 {
     public class ProFeedApp
     {
-        const double PRO_RANGE = 0.35;
-        const double MIN_RANGE = 0.25;
-        const int MINIMUM_RETWEETS = 5;
+        //const double PRO_RANGE = 0.35;
+        //const double MIN_RANGE = 0.25;
+        //const int MINIMUM_RETWEETS = 5;
         //private string[] searchQuery = { "fintech", "stockExchange", "forex" };
         private string[] searchQuery;
         private SemaphoreSlim taskSemaphore = new SemaphoreSlim(1, 1);
@@ -49,7 +49,7 @@ namespace TwitterAPI.Models
                 var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
                 InsertDataToTProfile(user, index);
-                if (inBusiness > MIN_RANGE)
+                if (inBusiness > ProFeedApiParameters.ProFeedAppParameters.MIN_RANGE)
                 {
                     SearchData.FinalList.Last().Profetional = true;
                     if (!ProFeedAlgorithm.Profetionals.Equals(user))
@@ -87,7 +87,7 @@ namespace TwitterAPI.Models
                 SearchData.FinalList.Add(new TProfile());
                 var inBusiness = ProFeedAlgorithm.IsProfetional(timeline, SearchData.SearchKeys, SearchData.FinalList.Last());
                 //to here
-                if (inBusiness > PRO_RANGE)
+                if (inBusiness > ProFeedApiParameters.ProFeedAppParameters.PRO_RANGE)
                 {
                     
                     InsertDataToTProfile(user,index);
@@ -147,8 +147,8 @@ namespace TwitterAPI.Models
             SearchData.SearchKeys.AddRange(searchQuery);
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
-
-            var tweets = await ProFeedTwitterModel.GetTwittsByQuery((string)SearchData.SearchKeys[(SearchData.SearchKeys.Count-1)], MINIMUM_RETWEETS);
+            //(string)SearchData.SearchKeys[(SearchData.SearchKeys.Count-1)]
+            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(query,ProFeedApiParameters.ProFeedAppParameters.MINIMUM_RETWEETS);
             insertToAppStackTrace = "Number of tweet in initial request:" + tweets.Length;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
@@ -224,8 +224,17 @@ namespace TwitterAPI.Models
             }
             insertToAppStackTrace = "Final number of influencers" + SearchData.FinalList.Count;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
-            
+
+
+            var result = SearchData.FinalList.OrderByDescending(OrderFunc).Take(10).ToList();
+
+            SearchData.FinalList = result;
+
             return SearchData;
+        }
+        private double OrderFunc(TProfile profile)
+        {
+            return profile.Rank;
         }
     }
 }

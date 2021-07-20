@@ -10,20 +10,20 @@ namespace TwitterAPI.Models
 {
     public class TwitterModel
     {
-        const string ApiKey = "8gJiTw1ohwk6EyfrKduvLJdII";
-        const string AccessTokenSecret = "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG";
-        const string AccessToken = "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
-        const string ApiKeySecret = "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
+        //const string ApiKey = "8gJiTw1ohwk6EyfrKduvLJdII";
+        //const string AccessTokenSecret = "b4k5NBgHL5L9ExbL9sJrrDeuYJ4nj88X8IY2VPnqZ0yzG";
+        //const string AccessToken = "1325866978804985857-3Jcrx5kswoPQdxRWB0Fvw8QlJpBPrK";
+        //const string ApiKeySecret = "UovMbaBiR2CFS30wn9MHCgJdh9sebdVEUab35koi1V8r7NqnNw";
         public TwitterClient Client { get; set; }
 
         public TwitterModel()
         {
-            Client = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+            Client = new TwitterClient(ProFeedApiParameters.TwitterModelParameters.ApiKey, ProFeedApiParameters.TwitterModelParameters.ApiKeySecret, ProFeedApiParameters.TwitterModelParameters.AccessToken, ProFeedApiParameters.TwitterModelParameters.AccessTokenSecret);
      
         }
         public void UpdateTwitterClient()
         {
-            Client = new TwitterClient(ApiKey, ApiKeySecret, AccessToken, AccessTokenSecret);
+            Client = new TwitterClient(ProFeedApiParameters.TwitterModelParameters.ApiKey, ProFeedApiParameters.TwitterModelParameters.ApiKeySecret, ProFeedApiParameters.TwitterModelParameters.AccessToken, ProFeedApiParameters.TwitterModelParameters.AccessTokenSecret);
         }
 
         public async Task<ITweet[]> GetTwittsByQuery(string Query, int RetweetMin)

@@ -9,17 +9,10 @@ namespace TwitterAPI.Models
 {
     public class ProFeedAlg
     {
-        const int MAXFOLLOWERS = 1000000;
-        const int MINFOLLOWERS = 5000;
-        const int AMPLIFIER = 5;
-        
-
         public List<IUser> Influencers { get; set; }
         public int AlgoLevel { get; set; }
         public List<int> InfluencersDagree { get; set; }
         public List<IUser> Profetionals { get; set; }
-
-
 
 
         public ProFeedAlg()
@@ -41,7 +34,7 @@ namespace TwitterAPI.Models
                 var followersCount = forFilter[i].CreatedBy.FollowersCount;
                 var friendsCount = forFilter[i].CreatedBy.FriendsCount;
                 var followerRank = (double)followersCount / (double)(followersCount + friendsCount);
-                if (followersCount > MINFOLLOWERS && followersCount < MAXFOLLOWERS && followerRank > 0.87) 
+                if (followersCount >ProFeedApiParameters.ProFeedAlgParameters.MinFolowers && followersCount < ProFeedApiParameters.ProFeedAlgParameters.MaxFolowers && followerRank > ProFeedApiParameters.ProFeedAlgParameters.MinRankFirstStep) 
                 {
                     if (!Influencers.Contains(forFilter[i].CreatedBy))
                     {
@@ -69,7 +62,7 @@ namespace TwitterAPI.Models
                 var followersCount = forFilter[i].FollowersCount;
                 var friendsCount = forFilter[i].FriendsCount;
                 var followerRank = (double)followersCount / (double)(followersCount + friendsCount);
-                if (followersCount > MINFOLLOWERS && followersCount < MAXFOLLOWERS && followerRank > 0.92)
+                if (followersCount > ProFeedApiParameters.ProFeedAlgParameters.MinFolowers && followersCount < ProFeedApiParameters.ProFeedAlgParameters.MaxFolowers && followerRank > ProFeedApiParameters.ProFeedAlgParameters.MinRankScondStep)
                 {
                     if (!Influencers.Contains(forFilter[i]))
                     {
@@ -166,7 +159,7 @@ namespace TwitterAPI.Models
             profile.RetweetedTweets = retweetCounter;
 
 
-            if (inCalculationCounter * AMPLIFIER < tweets.Length)
+            if (inCalculationCounter * ProFeedApiParameters.ProFeedAlgParameters.AMPLIFIER < tweets.Length)
                 return 0;
         
             return returnCalculation;
@@ -207,7 +200,10 @@ namespace TwitterAPI.Models
 
         public void RankFinalStage(TProfile profile)
         {
-
+            profile.Rank += (profile.Followers < ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerVolumeSmall) ? 2 : (profile.Followers < ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerVolumeMedium) ? 1 : 0;
+            profile.Rank += (profile.Engagment > ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerEngagementLarge) ? 3 : (profile.Engagment > ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerEngagementMedium) ? 2 : (profile.Engagment > ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerEngagementMedium) ? 1 : 0;
+            profile.Rank += (profile.GeneralActivity > ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerGneralActivityLarge) ? 3 : (profile.GeneralActivity > ProFeedApiParameters.ProFeedInfluencerParameters.InfluencerGneralActivityMedium) ? 2 : 0;
+            profile.Rank += (profile.Profetional) ? 2 : 0;
         }
 
         public void ClearLists()
