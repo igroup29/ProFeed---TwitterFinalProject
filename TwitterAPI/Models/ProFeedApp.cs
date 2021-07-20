@@ -147,8 +147,7 @@ namespace TwitterAPI.Models
             SearchData.SearchKeys.AddRange(searchQuery);
             string insertToAppStackTrace = "SearchQuery:" + query;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
-            //(string)SearchData.SearchKeys[(SearchData.SearchKeys.Count-1)]
-            var tweets = await ProFeedTwitterModel.GetTwittsByQuery(query,ProFeedApiParameters.ProFeedAppParameters.MINIMUM_RETWEETS);
+            var tweets = await ProFeedTwitterModel.GetTwittsByQuery((string)SearchData.SearchKeys[(SearchData.SearchKeys.Count - 1)], ProFeedApiParameters.ProFeedAppParameters.MINIMUM_RETWEETS);
             insertToAppStackTrace = "Number of tweet in initial request:" + tweets.Length;
             SearchData.AppStackTrace.Add(insertToAppStackTrace);
 
