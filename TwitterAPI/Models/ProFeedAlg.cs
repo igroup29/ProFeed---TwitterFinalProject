@@ -174,7 +174,7 @@ namespace TwitterAPI.Models
             var keys = query.Split(',');
             for(int i=0;i<keys.Length;i++)
             {
-                keys[i] = keys[i].Trim(' ');
+                keys[i] = keys[i].Replace(" ","");
             }
             return keys;
         }
