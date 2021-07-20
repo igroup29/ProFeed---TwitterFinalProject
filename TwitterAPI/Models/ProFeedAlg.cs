@@ -172,12 +172,18 @@ namespace TwitterAPI.Models
         public string[] QuerySearchKeys(string query)
         {
             var keys = query.Split(',');
+            for(int i=0;i<keys.Length;i++)
+            {
+                keys[i] = keys[i].Trim(' ');
+            }
             return keys;
         }
 
         public void RankingStage(IUser user,TProfile profile)
         {
             double calculationSupport = 0;
+            calculationSupport = Math.Round(profile.TweetsEngagmentRate, 2);
+            profile.TweetsEngagmentRate = calculationSupport;
             //engagement -> (total engagement/ impact)*100
             if (profile.OriginalTweets != 0)
             {
